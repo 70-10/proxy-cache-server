@@ -2,12 +2,14 @@
   "name": "proxy-cache-server",
   "private": true,
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "fix": "biome check --write ./src"
   },
   "dependencies": {
     "hono": "4.6.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/bun": "latest"
   }
 }

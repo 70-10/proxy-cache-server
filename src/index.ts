@@ -1,33 +1,38 @@
-import { Hono } from 'hono'
-import { StatusCode } from 'hono/utils/http-status'
+import { Hono } from "hono";
+import type { StatusCode } from "hono/utils/http-status";
 
 if (!Bun.env.PROXY_CACHE_SERVER_BASE_URL) {
-  throw new Error("PROXY_CACHE_SERVER_BASE_URL is required")
+  throw new Error("PROXY_CACHE_SERVER_BASE_URL is required");
 }
 const proxyBaseUrl = Bun.env.PROXY_CACHE_SERVER_BASE_URL;
 
-const app = new Hono()
+const app = new Hono();
 
-app.all("*", async c => {
-  const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query())
+app.all("*", async (c) => {
+  const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query());
 
   const res = await fetch(url.toString(), {
     method: c.req.method,
     headers: cleanRequestHeaders(new Headers(c.req.header())),
-    body: c.req.method !== "GET" && c.req.method !== "HEAD"
-      ? await c.req.text()
-      : undefined,
-  })
+    body:
+      c.req.method !== "GET" && c.req.method !== "HEAD"
+        ? await c.req.text()
+        : undefined,
+  });
 
   return c.body(await res.text(), {
     status: res.status as StatusCode,
-    headers: createResponseHeaders(res.headers)
+    headers: createResponseHeaders(res.headers),
   });
-})
+});
 
-export default app
+export default app;
 
-function createRequestUrl(baseUrl: string, path: string, query: Record<string, string>) {
+function createRequestUrl(
+  baseUrl: string,
+  path: string,
+  query: Record<string, string>,
+) {
   const url = new URL(path, baseUrl);
   for (const key in query) {
     url.searchParams.append(key, query[key]);
@@ -38,30 +43,29 @@ function createRequestUrl(baseUrl: string, path: string, query: Record<string, s
 function cleanRequestHeaders(originalHeaders: Headers): Headers {
   const headers = new Headers(originalHeaders);
 
-  headers.delete('Host');
-  headers.delete('Connection');
-  headers.delete('Proxy-Authorization');
-  headers.delete('Upgrade');
-  headers.delete('Referer');
+  headers.delete("Host");
+  headers.delete("Connection");
+  headers.delete("Proxy-Authorization");
+  headers.delete("Upgrade");
+  headers.delete("Referer");
 
   return headers;
 }
 
-
 function createResponseHeaders(proxyResponseHeaders: Headers) {
   const headers = new Headers(proxyResponseHeaders);
-  headers.delete('Content-Encoding');
-  headers.delete('Content-Length');
-  headers.delete('Transfer-Encoding');
-  headers.delete('Connection');
-  headers.delete('Proxy-Authenticate');
-  headers.delete('Proxy-Authorization');
-  headers.delete('Via');
-  headers.delete('Server');
-  headers.delete('X-Powered-By');
+  headers.delete("Content-Encoding");
+  headers.delete("Content-Length");
+  headers.delete("Transfer-Encoding");
+  headers.delete("Connection");
+  headers.delete("Proxy-Authenticate");
+  headers.delete("Proxy-Authorization");
+  headers.delete("Via");
+  headers.delete("Server");
+  headers.delete("X-Powered-By");
 
   // TODO: check
-  headers.delete('Set-Cookie');
+  headers.delete("Set-Cookie");
 
-  return headers
+  return headers;
 }
