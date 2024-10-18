@@ -13,6 +13,7 @@ app.all("*", async c => {
 
   const res = await fetch(url.toString(), {
     method: c.req.method,
+    headers: cleanRequestHeaders(new Headers(c.req.header())),
     body: c.req.method !== "GET" && c.req.method !== "HEAD"
       ? await c.req.text()
       : undefined,
@@ -32,6 +33,18 @@ function createRequestUrl(baseUrl: string, path: string, query: Record<string, s
     url.searchParams.append(key, query[key]);
   }
   return url;
+}
+
+function cleanRequestHeaders(originalHeaders: Headers): Headers {
+  const headers = new Headers(originalHeaders);
+
+  headers.delete('Host');
+  headers.delete('Connection');
+  headers.delete('Proxy-Authorization');
+  headers.delete('Upgrade');
+  headers.delete('Referer');
+
+  return headers;
 }
 
 
