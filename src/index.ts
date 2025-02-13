@@ -29,14 +29,16 @@ app.all("*", async (c) => {
   const text = await res.text();
   const responseHeaders = createResponseHeaders(res.headers);
 
-  await cacheResponse(
-    text,
-    res.status,
-    responseHeaders,
-    proxyBaseUrl,
-    c.req.path,
-    c.req.method,
-  );
+  if (res.ok) {
+    await cacheResponse(
+      text,
+      res.status,
+      responseHeaders,
+      proxyBaseUrl,
+      c.req.path,
+      c.req.method,
+    );
+  }
 
   return c.body(text, {
     status: res.status as StatusCode,
