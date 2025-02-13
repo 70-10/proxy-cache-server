@@ -12,7 +12,7 @@ const app = new Hono();
 app.all("*", async (c) => {
   const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query());
   const method = c.req.method;
-  const cache = await getCache(proxyBaseUrl, c.req);
+  const cache = await getCache(proxyBaseUrl, c.req.method, c.req.path);
   if (cache) {
     return c.body(cache.body, {
       status: cache.status,

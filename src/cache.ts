@@ -1,21 +1,21 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import type { HonoRequest } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
 
-export async function getCache(baseUrl: string, req: HonoRequest) {
-  const method = req.method;
+interface CacheContent {
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export async function getCache(baseUrl: string, method: string, path: string) {
   // ファイルキャッシュのパスを組み立てる
-  const relativePath = req.path.replace(/^\//, ""); // 先頭の / を除去
+  const relativePath = path.replace(/^\//, ""); // 先頭の / を除去
   const cacheFilePath = createCacheFilePath(baseUrl, method, relativePath);
 
   try {
     const cachedContent = await readFile(cacheFilePath, "utf-8");
-    const cached = JSON.parse(cachedContent) as {
-      body: string;
-      status: number;
-      headers: Record<string, string>;
-    };
+    const cached = JSON.parse(cachedContent) satisfies CacheContent;
 
     console.log("Return response from cache:", cacheFilePath);
     return {
@@ -32,7 +32,7 @@ export async function getCache(baseUrl: string, req: HonoRequest) {
 export async function cacheResponse(
   body: string,
   status: number,
-  responseHeaders: Headers,
+  headers: Headers,
   baseUrl: string,
   path: string,
   method: string,
@@ -45,12 +45,13 @@ export async function cacheResponse(
     status,
     headers: (() => {
       const headersObj: Record<string, string> = {};
-      responseHeaders.forEach((value, key) => {
+      headers.forEach((value, key) => {
         headersObj[key] = value;
       });
       return headersObj;
     })(),
-  };
+  } satisfies CacheContent;
+
   try {
     await mkdir(dirname(cacheFilePath), { recursive: true });
     await writeFile(cacheFilePath, JSON.stringify(cacheData));
