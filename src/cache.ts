@@ -8,10 +8,20 @@ interface CacheContent {
   body: string;
 }
 
-export async function getCache(baseUrl: string, method: string, path: string) {
+export async function getCache(
+  baseUrl: string,
+  method: string,
+  path: string,
+  query: Record<string, string>,
+) {
   // ファイルキャッシュのパスを組み立てる
   const relativePath = path.replace(/^\//, ""); // 先頭の / を除去
-  const cacheFilePath = createCacheFilePath(baseUrl, method, relativePath);
+  const cacheFilePath = createCacheFilePath(
+    baseUrl,
+    method,
+    relativePath,
+    query,
+  );
 
   try {
     const cachedContent = await readFile(cacheFilePath, "utf-8");
@@ -28,7 +38,6 @@ export async function getCache(baseUrl: string, method: string, path: string) {
     return null;
   }
 }
-
 export async function cacheResponse(
   body: string,
   status: number,
@@ -36,9 +45,15 @@ export async function cacheResponse(
   baseUrl: string,
   path: string,
   method: string,
+  query: Record<string, string>,
 ) {
   const relativePath = path.replace(/^\//, "");
-  const cacheFilePath = createCacheFilePath(baseUrl, method, relativePath);
+  const cacheFilePath = createCacheFilePath(
+    baseUrl,
+    method,
+    relativePath,
+    query,
+  );
 
   const cacheData = {
     body,
@@ -61,12 +76,28 @@ export async function cacheResponse(
   }
 }
 
-function createCacheFilePath(baseUrl: string, method: string, path: string) {
+function createCacheFilePath(
+  baseUrl: string,
+  method: string,
+  path: string,
+  query: Record<string, string>,
+) {
+  // クエリパラメーターをソートしてキー=値の形式に変換
+  const queryString = Object.entries(query)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+  // クエリがある場合はそれもパスに含める
+  const pathWithQuery = queryString
+    ? `${path}/${encodeURIComponent(queryString)}`
+    : path;
+
   return join(
     "cache",
     encodeURIComponent(baseUrl),
     method,
-    path,
+    pathWithQuery,
     "response.json",
   );
 }

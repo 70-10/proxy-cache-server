@@ -12,7 +12,12 @@ const app = new Hono();
 app.all("*", async (c) => {
   const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query());
   const method = c.req.method;
-  const cache = await getCache(proxyBaseUrl, c.req.method, c.req.path);
+  const cache = await getCache(
+    proxyBaseUrl,
+    c.req.method,
+    c.req.path,
+    c.req.query(),
+  );
   if (cache) {
     return c.body(cache.body, {
       status: cache.status,
@@ -29,16 +34,15 @@ app.all("*", async (c) => {
   const text = await res.text();
   const responseHeaders = createResponseHeaders(res.headers);
 
-  if (res.ok) {
-    await cacheResponse(
-      text,
-      res.status,
-      responseHeaders,
-      proxyBaseUrl,
-      c.req.path,
-      c.req.method,
-    );
-  }
+  await cacheResponse(
+    text,
+    res.status,
+    responseHeaders,
+    proxyBaseUrl,
+    c.req.path,
+    c.req.method,
+    c.req.query(),
+  );
 
   return c.body(text, {
     status: res.status as StatusCode,
