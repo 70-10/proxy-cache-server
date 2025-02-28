@@ -10,18 +10,24 @@ async function deleteDir(dir: string) {
   }
 }
 
+function createTestCacheDir() {
+  const timestamp = new Date().getTime();
+  const random = Math.random().toString(36).substring(2, 15);
+  return join(".test-cache", `${timestamp}-${random}`);
+}
+
 describe("cache", () => {
   const baseUrl = "https://api.example.com";
-  const cacheDir = "cache";
+  let testCacheDir: string;
 
   beforeEach(async () => {
-    // Arrange: テスト前にキャッシュディレクトリを削除
-    await deleteDir(cacheDir);
+    // Arrange: 新しいテスト用キャッシュディレクトリを作成
+    testCacheDir = createTestCacheDir();
   });
 
   afterEach(async () => {
     // Cleanup: テスト後にキャッシュディレクトリを削除
-    await deleteDir(cacheDir);
+    await deleteDir(testCacheDir);
   });
 
   describe("getCache", () => {
@@ -32,7 +38,7 @@ describe("cache", () => {
       const query = {};
 
       // Act
-      const result = await getCache(baseUrl, method, path, query);
+      const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
       // Assert
       expect(result).toBeNull();
@@ -55,10 +61,11 @@ describe("cache", () => {
         path,
         method,
         query,
+        testCacheDir,
       );
 
       // Act
-      const result = await getCache(baseUrl, method, path, query);
+      const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
       // Assert
       expect(result).not.toBeNull();
@@ -84,6 +91,7 @@ describe("cache", () => {
         path,
         method,
         query1,
+        testCacheDir,
       );
 
       await cacheResponse(
@@ -94,11 +102,24 @@ describe("cache", () => {
         path,
         method,
         query2,
+        testCacheDir,
       );
 
       // Act
-      const result1 = await getCache(baseUrl, method, path, query1);
-      const result2 = await getCache(baseUrl, method, path, query2);
+      const result1 = await getCache(
+        baseUrl,
+        method,
+        path,
+        query1,
+        testCacheDir,
+      );
+      const result2 = await getCache(
+        baseUrl,
+        method,
+        path,
+        query2,
+        testCacheDir,
+      );
 
       // Assert
       expect(result1?.body).toBe(response1);
@@ -121,10 +142,17 @@ describe("cache", () => {
         path,
         method,
         query1,
+        testCacheDir,
       );
 
       // Act
-      const result = await getCache(baseUrl, method, path, query2);
+      const result = await getCache(
+        baseUrl,
+        method,
+        path,
+        query2,
+        testCacheDir,
+      );
 
       // Assert
       expect(result?.body).toBe(responseBody);
@@ -150,11 +178,12 @@ describe("cache", () => {
         path,
         method,
         query,
+        testCacheDir,
       );
 
       // Assert
       const cacheFilePath = join(
-        cacheDir,
+        testCacheDir,
         encodeURIComponent(baseUrl),
         method,
         path,
@@ -162,7 +191,7 @@ describe("cache", () => {
       );
       expect(existsSync(cacheFilePath)).toBe(true);
 
-      const result = await getCache(baseUrl, method, path, query);
+      const result = await getCache(baseUrl, method, path, query, testCacheDir);
       expect(result?.body).toBe(responseBody);
       expect(result?.status).toBe(status);
       expect(result?.headers.get("content-type")).toBe("application/json");
@@ -184,10 +213,11 @@ describe("cache", () => {
         path,
         method,
         query,
+        testCacheDir,
       );
 
       // Assert
-      const result = await getCache(baseUrl, method, path, query);
+      const result = await getCache(baseUrl, method, path, query, testCacheDir);
       expect(result?.body).toBe(responseBody);
     });
   });
