@@ -111,7 +111,7 @@ async function main() {
   const cacheDir = "cache";
 
   if (!(await existsDir(cacheDir))) {
-    logger.log("No cache entries found.");
+    logger.error("No cache entries found.");
     return;
   }
 
@@ -127,7 +127,7 @@ async function main() {
     );
 
     if (validEntries.length === 0) {
-      logger.log("No cache entries found.");
+      logger.error("No cache entries found.");
       return;
     }
 
