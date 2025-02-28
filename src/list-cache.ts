@@ -1,5 +1,6 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { logger } from "./utils/logger";
 
 interface CacheContent {
   status: number;
@@ -92,7 +93,7 @@ export async function parseCacheFile(
       cachedAt: new Date(stats.mtime),
     };
   } catch (error) {
-    console.error("Failed to parse cache file:", filePath, error);
+    logger.error("Failed to parse cache file:", filePath, error);
     return null;
   }
 }
@@ -110,7 +111,7 @@ async function main() {
   const cacheDir = "cache";
 
   if (!(await existsDir(cacheDir))) {
-    console.log("No cache entries found.");
+    logger.log("No cache entries found.");
     return;
   }
 
@@ -126,7 +127,7 @@ async function main() {
     );
 
     if (validEntries.length === 0) {
-      console.log("No cache entries found.");
+      logger.log("No cache entries found.");
       return;
     }
 
@@ -136,12 +137,12 @@ async function main() {
     // 結果を表示
     for (const entry of validEntries) {
       const timestamp = entry.cachedAt.toLocaleString();
-      console.log(
+      logger.log(
         `${entry.method} ${entry.fullUrl} (${entry.status}) - Cached at ${timestamp}`,
       );
     }
   } catch (error) {
-    console.error("Failed to list cache entries:", error);
+    logger.error("Failed to list cache entries:", error);
     process.exit(1);
   }
 }

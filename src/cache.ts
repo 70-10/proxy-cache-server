@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { StatusCode } from "hono/utils/http-status";
+import { logger } from "./utils/logger";
 
 interface CacheContent {
   status: number;
@@ -29,14 +30,14 @@ export async function getCache(
     const cachedContent = await readFile(cacheFilePath, "utf-8");
     const cached = JSON.parse(cachedContent) satisfies CacheContent;
 
-    console.log("Return response from cache:", cacheFilePath);
+    logger.log("Return response from cache:", cacheFilePath);
     return {
       body: cached.body,
       status: cached.status as StatusCode,
       headers: new Headers(cached.headers),
     };
   } catch (e) {
-    console.log("Cache not found, fetch from API:", cacheFilePath);
+    logger.log("Cache not found, fetch from API:", cacheFilePath);
     return null;
   }
 }
@@ -74,9 +75,9 @@ export async function cacheResponse(
   try {
     await mkdir(dirname(cacheFilePath), { recursive: true });
     await writeFile(cacheFilePath, JSON.stringify(cacheData));
-    console.log("Saved response to cache:", cacheFilePath);
+    logger.log("Saved response to cache:", cacheFilePath);
   } catch (err) {
-    console.error("Failed to write cache file", cacheFilePath, err);
+    logger.error("Failed to write cache file", cacheFilePath, err);
   }
 }
 
