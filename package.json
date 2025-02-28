@@ -1,9 +1,11 @@
 {
   "name": "proxy-cache-server",
+  "version": "",
   "private": true,
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "fix": "biome check --write ./src"
+    "fix": "biome check --write ./src",
+    "cache-list": "bun run src/list-cache.ts"
   },
   "dependencies": {
     "hono": "4.6.3"

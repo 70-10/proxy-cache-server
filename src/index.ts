@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
+import { cacheResponse, getCache } from "./cache";
 
 if (!Bun.env.PROXY_CACHE_SERVER_BASE_URL) {
   throw new Error("PROXY_CACHE_SERVER_BASE_URL is required");
@@ -10,19 +11,42 @@ const app = new Hono();
 
 app.all("*", async (c) => {
   const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query());
+  const method = c.req.method;
+  const cache = await getCache(
+    proxyBaseUrl,
+    c.req.method,
+    c.req.path,
+    c.req.query(),
+  );
+  if (cache) {
+    return c.body(cache.body, {
+      status: cache.status,
+      headers: cache.headers,
+    });
+  }
 
   const res = await fetch(url.toString(), {
-    method: c.req.method,
+    method,
     headers: cleanRequestHeaders(new Headers(c.req.header())),
     body:
-      c.req.method !== "GET" && c.req.method !== "HEAD"
-        ? await c.req.text()
-        : undefined,
+      method !== "GET" && method !== "HEAD" ? await c.req.text() : undefined,
   });
+  const text = await res.text();
+  const responseHeaders = createResponseHeaders(res.headers);
 
-  return c.body(await res.text(), {
+  await cacheResponse(
+    text,
+    res.status,
+    responseHeaders,
+    proxyBaseUrl,
+    c.req.path,
+    c.req.method,
+    c.req.query(),
+  );
+
+  return c.body(text, {
     status: res.status as StatusCode,
-    headers: createResponseHeaders(res.headers),
+    headers: responseHeaders,
   });
 });
 
@@ -52,7 +76,7 @@ function cleanRequestHeaders(originalHeaders: Headers): Headers {
   return headers;
 }
 
-function createResponseHeaders(proxyResponseHeaders: Headers) {
+function createResponseHeaders(proxyResponseHeaders: Headers): Headers {
   const headers = new Headers(proxyResponseHeaders);
   headers.delete("Content-Encoding");
   headers.delete("Content-Length");
