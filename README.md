@@ -72,7 +72,7 @@ bun run dev
 The cache-list functionality allows you to view all cached API responses in your system.
 
 ```bash
-bun run src/list-cache.ts
+bun run cache-list
 ```
 
 #### Output Format
@@ -108,19 +108,19 @@ POST https://api.example.com/users/123/update (201) - Cached at 2024-02-28 13:47
 
 1. **Audit Cache Contents**
    ```bash
-   bun run src/list-cache.ts
+   bun run cache-list
    ```
    View all cached responses to understand what's available locally.
 
 2. **Debug Cache Issues**
    ```bash
-   bun run src/list-cache.ts | grep "users"
+   bun run cache-list | grep "users"
    ```
    Find specific cached endpoints by filtering the output.
 
 3. **Monitor Cache Growth**
    ```bash
-   bun run src/list-cache.ts | wc -l
+   bun run cache-list | wc -l
    ```
    Count the number of cached responses.
 
