@@ -1,12 +1,12 @@
-import { describe, expect, test, beforeEach, afterEach } from "bun:test";
-import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdir } from "node:fs/promises";
-import * as ListCache from "./list-cache";
+import { join } from "node:path";
 import {
+  createTestCacheDir,
   createTestFile,
   deleteDir,
-  createTestCacheDir,
 } from "../tests/helper/test-utils";
+import * as ListCache from "./list-cache";
 
 describe("Cache System", () => {
   let testCacheDir: string;
