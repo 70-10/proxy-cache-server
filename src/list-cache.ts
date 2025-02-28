@@ -97,11 +97,25 @@ export async function parseCacheFile(
   }
 }
 
-async function main() {
+async function existsDir(dir: string): Promise<boolean> {
   try {
-    const cacheDir = "cache";
-    const cacheFiles = await findCacheFiles(cacheDir);
+    await stat(dir);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
+async function main() {
+  const cacheDir = "cache";
+
+  if (!(await existsDir(cacheDir))) {
+    console.log("No cache entries found.");
+    return;
+  }
+
+  try {
+    const cacheFiles = await findCacheFiles(cacheDir);
     const entries = await Promise.all(
       cacheFiles.map((file) => parseCacheFile(file)),
     );
@@ -110,6 +124,11 @@ async function main() {
     const validEntries = entries.filter(
       (entry): entry is CacheEntry => entry !== null,
     );
+
+    if (validEntries.length === 0) {
+      console.log("No cache entries found.");
+      return;
+    }
 
     // 日時でソート（新しい順）
     validEntries.sort((a, b) => b.cachedAt.getTime() - a.cachedAt.getTime());
