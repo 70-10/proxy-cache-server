@@ -1,51 +1,41 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { getCache, cacheResponse } from "./cache";
-import { rm } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import { deleteDir, createTestCacheDir } from "../tests/helper/test-utils";
 
-async function deleteDir(dir: string) {
-  if (existsSync(dir)) {
-    await rm(dir, { recursive: true });
-  }
-}
-
-function createTestCacheDir() {
-  const timestamp = new Date().getTime();
-  const random = Math.random().toString(36).substring(2, 15);
-  return join(".test-cache", `${timestamp}-${random}`);
-}
-
-describe("cache", () => {
+describe("Cache Operations", () => {
   const baseUrl = "https://api.example.com";
   let testCacheDir: string;
 
   beforeEach(async () => {
-    // Arrange: 新しいテスト用キャッシュディレクトリを作成
+    // Create a new test cache directory
     testCacheDir = createTestCacheDir();
+    await mkdir(testCacheDir, { recursive: true });
   });
 
   afterEach(async () => {
-    // Cleanup: テスト後にキャッシュディレクトリを削除
+    // Clean up test directory
     await deleteDir(testCacheDir);
   });
 
-  describe("getCache", () => {
-    test("returns null when cache does not exist", async () => {
-      // Arrange
+  describe("when retrieving cache", () => {
+    test("should return null when cache does not exist", async () => {
+      // Arrange: Set up test path and method
       const path = "/users";
       const method = "GET";
       const query = {};
 
-      // Act
+      // Act: Attempt to retrieve non-existent cache
       const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
-      // Assert
+      // Assert: Should return null
       expect(result).toBeNull();
     });
 
-    test("returns cached response when cache exists", async () => {
-      // Arrange
+    test("should return cached response when cache exists", async () => {
+      // Arrange: Create a cache entry
       const path = "/users";
       const method = "GET";
       const query = {};
@@ -64,18 +54,18 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Act
+      // Act: Retrieve the cached response
       const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
-      // Assert
+      // Assert: Should match the cached content
       expect(result).not.toBeNull();
       expect(result?.body).toBe(responseBody);
       expect(result?.status).toBe(status);
       expect(result?.headers.get("content-type")).toBe("application/json");
     });
 
-    test("handles different query parameters separately", async () => {
-      // Arrange
+    test("should handle different query parameters as separate caches", async () => {
+      // Arrange: Create two cache entries with different query params
       const path = "/users";
       const method = "GET";
       const query1 = { foo: "bar" };
@@ -105,7 +95,7 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Act
+      // Act: Retrieve both cached responses
       const result1 = await getCache(
         baseUrl,
         method,
@@ -121,13 +111,13 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Assert
+      // Assert: Should return correct response for each query
       expect(result1?.body).toBe(response1);
       expect(result2?.body).toBe(response2);
     });
 
-    test("query parameter order does not affect caching", async () => {
-      // Arrange
+    test("should treat query parameters as order-independent", async () => {
+      // Arrange: Create cache with one query parameter order
       const path = "/users";
       const method = "GET";
       const responseBody = JSON.stringify({ id: 1 });
@@ -145,7 +135,7 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Act
+      // Act: Retrieve with different parameter order
       const result = await getCache(
         baseUrl,
         method,
@@ -154,14 +144,14 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Assert
+      // Assert: Should return same response regardless of parameter order
       expect(result?.body).toBe(responseBody);
     });
   });
 
-  describe("cacheResponse", () => {
-    test("creates cache file with correct content", async () => {
-      // Arrange
+  describe("when storing cache", () => {
+    test("should create cache file with correct content and structure", async () => {
+      // Arrange: Prepare cache content
       const path = "/users";
       const method = "GET";
       const query = {};
@@ -169,7 +159,7 @@ describe("cache", () => {
       const status = 200;
       const headers = new Headers({ "content-type": "application/json" });
 
-      // Act
+      // Act: Store the cache
       await cacheResponse(
         responseBody,
         status,
@@ -181,7 +171,7 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Assert
+      // Assert: Cache file should exist and contain correct content
       const cacheFilePath = join(
         testCacheDir,
         encodeURIComponent(baseUrl),
@@ -197,14 +187,14 @@ describe("cache", () => {
       expect(result?.headers.get("content-type")).toBe("application/json");
     });
 
-    test("handles paths with leading slash", async () => {
-      // Arrange
+    test("should handle paths with leading slash correctly", async () => {
+      // Arrange: Prepare path with leading slash
       const path = "/users/123";
       const method = "GET";
       const query = {};
       const responseBody = JSON.stringify({ id: 123 });
 
-      // Act
+      // Act: Store cache with leading slash path
       await cacheResponse(
         responseBody,
         200,
@@ -216,7 +206,7 @@ describe("cache", () => {
         testCacheDir,
       );
 
-      // Assert
+      // Assert: Should retrieve cache correctly
       const result = await getCache(baseUrl, method, path, query, testCacheDir);
       expect(result?.body).toBe(responseBody);
     });
