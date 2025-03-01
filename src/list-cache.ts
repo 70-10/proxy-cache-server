@@ -1,18 +1,6 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
-
-interface CacheContent {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-}
-
-interface CacheEntry {
-  method: string;
-  fullUrl: string;
-  status: number;
-  cachedAt: Date;
-}
+import type { CacheContent, CacheEntry } from "./models";
 
 export async function findCacheFiles(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
