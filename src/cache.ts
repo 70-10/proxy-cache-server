@@ -1,12 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { StatusCode } from "hono/utils/http-status";
-
-interface CacheContent {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-}
+import type { CacheContent } from "./models";
 
 export async function getCache(
   baseUrl: string,
