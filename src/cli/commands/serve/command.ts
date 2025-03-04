@@ -1,7 +1,7 @@
 import { defineCommand } from "citty";
 import { Hono } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
-import { cacheResponse, getCache } from "../../cache";
+import { cacheResponse, getCache } from "src/cache";
 
 // Utility functions for request handling
 function createRequestUrl(

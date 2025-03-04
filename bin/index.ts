@@ -1,8 +1,9 @@
 #!/usr/bin/env bun
 import { defineCommand, runMain } from "citty";
-import { serveCommand } from "../src/cli/commands/serve-command";
-import { cashCommand } from "../src/cli/commands/cash/command";
+import { cacheCommand } from "src/cli/commands/cache/command";
+import { serveCommand } from "src/cli/commands/serve/command";
 
+// Define the main command
 const main = defineCommand({
   meta: {
     name: "proxy-cache-server",
@@ -11,7 +12,7 @@ const main = defineCommand({
   },
   subCommands: {
     serve: serveCommand,
-    cash: cashCommand,
+    cache: cacheCommand,
   },
 });
 
