@@ -46,7 +46,7 @@ proxy-cache-server serve <target-url> [options]
 
 #### Options
 - `--port <number>`: Port number to listen on (default: 3000)
-- `--cache <path>`: Cache directory path (default: ./cache)
+- `--cache <path>`: Cache directory path (default: .proxy-cache, defined in DEFAULT_CACHE_DIRECTORY_NAME constant)
 
 #### Example Usage
 ```bash

@@ -2,13 +2,14 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { StatusCode } from "hono/utils/http-status";
 import type { CacheContent } from "./models";
+import { DEFAULT_CACHE_DIRECTORY_NAME } from "./models/constants";
 
 export async function getCache(
   baseUrl: string,
   method: string,
   path: string,
   query: Record<string, string>,
-  cacheDir = ".proxy-cache",
+  cacheDir = DEFAULT_CACHE_DIRECTORY_NAME,
 ) {
   // ファイルキャッシュのパスを組み立てる
   const relativePath = path.replace(/^\//, ""); // 先頭の / を除去
@@ -43,7 +44,7 @@ export async function cacheResponse(
   path: string,
   method: string,
   query: Record<string, string>,
-  cacheDir = ".proxy-cache",
+  cacheDir = DEFAULT_CACHE_DIRECTORY_NAME,
 ) {
   const relativePath = path.replace(/^\//, "");
   const cacheFilePath = createCacheFilePath(
@@ -80,7 +81,7 @@ function createCacheFilePath(
   method: string,
   path: string,
   query: Record<string, string>,
-  cacheDir = ".proxy-cache",
+  cacheDir = DEFAULT_CACHE_DIRECTORY_NAME,
 ) {
   // クエリパラメーターをソートしてキー=値の形式に変換
   const queryString = Object.entries(query)

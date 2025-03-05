@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import type { CacheContent, CacheEntry } from "./models";
+import { DEFAULT_CACHE_DIRECTORY_NAME } from "./models/constants";
 
 export async function findCacheFiles(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -24,7 +25,7 @@ export async function parseCacheFile(
   try {
     // キャッシュファイルのパスから情報を抽出
     const pathParts = filePath.split("/");
-    const methodIndex = pathParts.indexOf(".proxy-cache") + 2;
+    const methodIndex = pathParts.indexOf(DEFAULT_CACHE_DIRECTORY_NAME) + 2;
     if (methodIndex >= pathParts.length) return null;
 
     const baseUrl = decodeURIComponent(pathParts[methodIndex - 1]);
@@ -33,7 +34,7 @@ export async function parseCacheFile(
     // パス部分の抽出（methodIndex以降からresponse.jsonの前まで）
     const pathSegments = pathParts.slice(methodIndex + 1, -1);
     // cache ディレクトリの存在確認
-    const cacheIndex = pathParts.indexOf(".proxy-cache");
+    const cacheIndex = pathParts.indexOf(DEFAULT_CACHE_DIRECTORY_NAME);
     if (cacheIndex === -1) return null;
 
     let path = "";

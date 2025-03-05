@@ -5,6 +5,7 @@ import {
   parseCacheFile,
 } from "../../../../list-cache";
 import type { CacheEntry } from "../../../../models";
+import { DEFAULT_CACHE_DIRECTORY_NAME } from "../../../../models/constants";
 
 export const listCommand = defineCommand({
   meta: {
@@ -12,7 +13,7 @@ export const listCommand = defineCommand({
     description: "List all cached items",
   },
   async run() {
-    const cacheDir = ".proxy-cache";
+    const cacheDir = DEFAULT_CACHE_DIRECTORY_NAME;
 
     if (!(await existsDir(cacheDir))) {
       console.log("No cache entries found.");
