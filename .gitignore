@@ -1,7 +1,7 @@
 # deps
 node_modules/
 
-cache/
+.proxy-cache/
 .test-cache/
 
 dist/

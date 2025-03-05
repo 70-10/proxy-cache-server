@@ -24,7 +24,7 @@ export async function parseCacheFile(
   try {
     // キャッシュファイルのパスから情報を抽出
     const pathParts = filePath.split("/");
-    const methodIndex = pathParts.indexOf("cache") + 2;
+    const methodIndex = pathParts.indexOf(".proxy-cache") + 2;
     if (methodIndex >= pathParts.length) return null;
 
     const baseUrl = decodeURIComponent(pathParts[methodIndex - 1]);
@@ -33,7 +33,7 @@ export async function parseCacheFile(
     // パス部分の抽出（methodIndex以降からresponse.jsonの前まで）
     const pathSegments = pathParts.slice(methodIndex + 1, -1);
     // cache ディレクトリの存在確認
-    const cacheIndex = pathParts.indexOf("cache");
+    const cacheIndex = pathParts.indexOf(".proxy-cache");
     if (cacheIndex === -1) return null;
 
     let path = "";

@@ -75,7 +75,7 @@ describe("Cache System", () => {
       const status = 200;
       const fullPath = join(
         testCacheDir,
-        "cache",
+        ".proxy-cache",
         encodeURIComponent(baseUrl),
         method,
         path,
@@ -111,7 +111,7 @@ describe("Cache System", () => {
       const query = "page=1&limit=10";
       const fullPath = join(
         testCacheDir,
-        "cache",
+        ".proxy-cache",
         encodeURIComponent(baseUrl),
         method,
         path,
@@ -140,7 +140,7 @@ describe("Cache System", () => {
       const path = "users/名前";
       const fullPath = join(
         testCacheDir,
-        "cache",
+        ".proxy-cache",
         encodeURIComponent(baseUrl),
         method,
         encodeURIComponent(path),
@@ -165,7 +165,7 @@ describe("Cache System", () => {
       // Arrange: Create a cache file with invalid JSON content
       const fullPath = join(
         testCacheDir,
-        "cache",
+        ".proxy-cache",
         "test",
         "GET",
         "invalid",
@@ -200,7 +200,7 @@ describe("Cache System", () => {
         {
           path: join(
             testCacheDir,
-            "cache",
+            ".proxy-cache",
             encodeURIComponent("https://api1.example.com"),
             "GET",
             "users",
@@ -211,7 +211,7 @@ describe("Cache System", () => {
         {
           path: join(
             testCacheDir,
-            "cache",
+            ".proxy-cache",
             encodeURIComponent("https://api2.example.com"),
             "GET",
             "posts",
