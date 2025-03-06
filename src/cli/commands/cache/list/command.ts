@@ -12,8 +12,15 @@ export const listCommand = defineCommand({
     name: "list",
     description: "List all cached items",
   },
-  async run() {
-    const cacheDir = DEFAULT_CACHE_DIRECTORY_NAME;
+  args: {
+    cache: {
+      type: "string",
+      description: "Cache directory path",
+      default: DEFAULT_CACHE_DIRECTORY_NAME,
+    },
+  },
+  async run({ args }) {
+    const cacheDir = args.cache;
 
     if (!(await existsDir(cacheDir))) {
       console.log("No cache entries found.");
