@@ -2,6 +2,7 @@ import { defineCommand } from "citty";
 import { Hono } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
 import { cacheResponse, getCache } from "src/cache";
+import { DEFAULT_CACHE_DIRECTORY_NAME } from "src/models/constants";
 
 // Utility functions for request handling
 function createRequestUrl(
@@ -59,7 +60,7 @@ export const serveCommand = defineCommand({
     cache: {
       type: "string",
       description: "Cache directory path",
-      default: "./cache",
+      default: DEFAULT_CACHE_DIRECTORY_NAME,
     },
     port: {
       type: "string",
