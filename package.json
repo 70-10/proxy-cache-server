@@ -7,7 +7,7 @@
     "proxy-cache-server": "dist/bin/index.js"
   },
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun run bin/index.ts",
     "fix": "biome check --write ./src",
     "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin && chmod +x ./dist/bin/index.js",
     "build": "bun run compile"
