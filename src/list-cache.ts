@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import type { CacheContent, CacheEntry } from "./models";
+import { DEFAULT_CACHE_DIRECTORY_NAME } from "./models/constants";
 
 export async function findCacheFiles(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -24,7 +25,7 @@ export async function parseCacheFile(
   try {
     // キャッシュファイルのパスから情報を抽出
     const pathParts = filePath.split("/");
-    const methodIndex = pathParts.indexOf("cache") + 2;
+    const methodIndex = pathParts.indexOf(DEFAULT_CACHE_DIRECTORY_NAME) + 2;
     if (methodIndex >= pathParts.length) return null;
 
     const baseUrl = decodeURIComponent(pathParts[methodIndex - 1]);
@@ -33,7 +34,7 @@ export async function parseCacheFile(
     // パス部分の抽出（methodIndex以降からresponse.jsonの前まで）
     const pathSegments = pathParts.slice(methodIndex + 1, -1);
     // cache ディレクトリの存在確認
-    const cacheIndex = pathParts.indexOf("cache");
+    const cacheIndex = pathParts.indexOf(DEFAULT_CACHE_DIRECTORY_NAME);
     if (cacheIndex === -1) return null;
 
     let path = "";
@@ -85,7 +86,7 @@ export async function parseCacheFile(
   }
 }
 
-async function existsDir(dir: string): Promise<boolean> {
+export async function existsDir(dir: string): Promise<boolean> {
   try {
     await stat(dir);
     return true;
@@ -93,45 +94,3 @@ async function existsDir(dir: string): Promise<boolean> {
     return false;
   }
 }
-
-async function main() {
-  const cacheDir = "cache";
-
-  if (!(await existsDir(cacheDir))) {
-    console.log("No cache entries found.");
-    return;
-  }
-
-  try {
-    const cacheFiles = await findCacheFiles(cacheDir);
-    const entries = await Promise.all(
-      cacheFiles.map((file) => parseCacheFile(file)),
-    );
-
-    // nullを除外して有効なエントリのみを取得
-    const validEntries = entries.filter(
-      (entry): entry is CacheEntry => entry !== null,
-    );
-
-    if (validEntries.length === 0) {
-      console.log("No cache entries found.");
-      return;
-    }
-
-    // 日時でソート（新しい順）
-    validEntries.sort((a, b) => b.cachedAt.getTime() - a.cachedAt.getTime());
-
-    // 結果を表示
-    for (const entry of validEntries) {
-      const timestamp = entry.cachedAt.toLocaleString();
-      console.log(
-        `${entry.method} ${entry.fullUrl} (${entry.status}) - Cached at ${timestamp}`,
-      );
-    }
-  } catch (error) {
-    console.error("Failed to list cache entries:", error);
-    process.exit(1);
-  }
-}
-
-main();

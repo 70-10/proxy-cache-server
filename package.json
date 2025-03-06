@@ -1,13 +1,19 @@
 {
   "name": "proxy-cache-server",
-  "version": "",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "bin": {
+    "proxy-cache-server": "dist/bin/index.js"
+  },
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun run bin/index.ts",
     "fix": "biome check --write ./src",
-    "cache-list": "bun run src/list-cache.ts"
+    "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin && chmod +x ./dist/bin/index.js",
+    "build": "bun run compile"
   },
   "dependencies": {
+    "citty": "0.1.6",
     "hono": "4.6.3"
   },
   "devDependencies": {

@@ -8,7 +8,7 @@ export async function getCache(
   method: string,
   path: string,
   query: Record<string, string>,
-  cacheDir = "cache",
+  cacheDir: string,
 ) {
   // ファイルキャッシュのパスを組み立てる
   const relativePath = path.replace(/^\//, ""); // 先頭の / を除去
@@ -43,7 +43,7 @@ export async function cacheResponse(
   path: string,
   method: string,
   query: Record<string, string>,
-  cacheDir = "cache",
+  cacheDir: string,
 ) {
   const relativePath = path.replace(/^\//, "");
   const cacheFilePath = createCacheFilePath(
@@ -80,7 +80,7 @@ function createCacheFilePath(
   method: string,
   path: string,
   query: Record<string, string>,
-  cacheDir = "cache",
+  cacheDir: string,
 ) {
   // クエリパラメーターをソートしてキー=値の形式に変換
   const queryString = Object.entries(query)

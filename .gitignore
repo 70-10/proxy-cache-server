@@ -1,5 +1,10 @@
 # deps
 node_modules/
 
-cache/
+.proxy-cache/
 .test-cache/
+
+dist/
+*.log
+.DS_Store
+
