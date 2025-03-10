@@ -46,11 +46,21 @@ export const listCommand = defineCommand({
       // URLで昇順ソート
       validEntries.sort((a, b) => a.fullUrl.localeCompare(b.fullUrl));
 
+      // 最も長いURLの長さを取得してパディングの基準とする
+      const maxUrlLength = Math.max(
+        ...validEntries.map((entry) => entry.fullUrl.length),
+      );
+
       // 結果を表示
       for (const entry of validEntries) {
         const timestamp = entry.cachedAt.toLocaleString();
         console.log(
-          `${entry.method} ${entry.fullUrl} (${entry.status}) - Cached at ${timestamp}`,
+          // Payment Control Format Specification requires consistent field widths and formatting:
+          // - HTTP method: 7 characters wide
+          // - URL: full URL with padding aligned to the longest URL
+          // - Status: enclosed in parentheses
+          // - Timestamp: fixed position alignment after status
+          `${entry.method.padEnd(7)} ${entry.fullUrl.padEnd(maxUrlLength)} (${entry.status})    Cached at: ${timestamp}`,
         );
       }
     } catch (error) {
