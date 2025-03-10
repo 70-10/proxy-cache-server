@@ -44,14 +44,18 @@ describe("Cache Operations", () => {
       const headers = new Headers({ "content-type": "application/json" });
 
       await cacheResponse(
-        responseBody,
-        status,
-        headers,
-        baseUrl,
-        path,
-        method,
-        query,
-        testCacheDir,
+        {
+          body: responseBody,
+          status,
+          headers,
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query,
+          cacheDir: testCacheDir,
+        },
       );
 
       // Act: Retrieve the cached response
@@ -74,25 +78,33 @@ describe("Cache Operations", () => {
       const response2 = JSON.stringify({ id: 2 });
 
       await cacheResponse(
-        response1,
-        200,
-        new Headers(),
-        baseUrl,
-        path,
-        method,
-        query1,
-        testCacheDir,
+        {
+          body: response1,
+          status: 200,
+          headers: new Headers(),
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query: query1,
+          cacheDir: testCacheDir,
+        },
       );
 
       await cacheResponse(
-        response2,
-        200,
-        new Headers(),
-        baseUrl,
-        path,
-        method,
-        query2,
-        testCacheDir,
+        {
+          body: response2,
+          status: 200,
+          headers: new Headers(),
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query: query2,
+          cacheDir: testCacheDir,
+        },
       );
 
       // Act: Retrieve both cached responses
@@ -125,14 +137,18 @@ describe("Cache Operations", () => {
       const query2 = { bar: "2", foo: "1" };
 
       await cacheResponse(
-        responseBody,
-        200,
-        new Headers(),
-        baseUrl,
-        path,
-        method,
-        query1,
-        testCacheDir,
+        {
+          body: responseBody,
+          status: 200,
+          headers: new Headers(),
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query: query1,
+          cacheDir: testCacheDir,
+        },
       );
 
       // Act: Retrieve with different parameter order
@@ -161,14 +177,18 @@ describe("Cache Operations", () => {
 
       // Act: Store the cache
       await cacheResponse(
-        responseBody,
-        status,
-        headers,
-        baseUrl,
-        path,
-        method,
-        query,
-        testCacheDir,
+        {
+          body: responseBody,
+          status,
+          headers,
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query,
+          cacheDir: testCacheDir,
+        },
       );
 
       // Assert: Cache file should exist and contain correct content
@@ -196,14 +216,18 @@ describe("Cache Operations", () => {
 
       // Act: Store cache with leading slash path
       await cacheResponse(
-        responseBody,
-        200,
-        new Headers(),
-        baseUrl,
-        path,
-        method,
-        query,
-        testCacheDir,
+        {
+          body: responseBody,
+          status: 200,
+          headers: new Headers(),
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query,
+          cacheDir: testCacheDir,
+        },
       );
 
       // Assert: Should retrieve cache correctly

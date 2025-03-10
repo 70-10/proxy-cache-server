@@ -35,35 +35,37 @@ export async function getCache(
     return null;
   }
 }
+interface ResponseData {
+  body: string;
+  status: number;
+  headers: Headers;
+}
+
+interface CacheOptions {
+  baseUrl: string;
+  path: string;
+  method: string;
+  query: Record<string, string>;
+  cacheDir: string;
+}
+
 export async function cacheResponse(
-  body: string,
-  status: number,
-  headers: Headers,
-  baseUrl: string,
-  path: string,
-  method: string,
-  query: Record<string, string>,
-  cacheDir: string,
+  response: ResponseData,
+  options: CacheOptions,
 ) {
-  const relativePath = path.replace(/^\//, "");
+  const relativePath = options.path.replace(/^\//, "");
   const cacheFilePath = createCacheFilePath(
-    baseUrl,
-    method,
+    options.baseUrl,
+    options.method,
     relativePath,
-    query,
-    cacheDir,
+    options.query,
+    options.cacheDir,
   );
 
   const cacheData = {
-    body,
-    status,
-    headers: (() => {
-      const headersObj: Record<string, string> = {};
-      headers.forEach((value, key) => {
-        headersObj[key] = value;
-      });
-      return headersObj;
-    })(),
+    body: response.body,
+    status: response.status,
+    headers: Object.fromEntries(response.headers.entries()),
   } satisfies CacheContent;
 
   try {

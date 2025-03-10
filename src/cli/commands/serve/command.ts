@@ -115,14 +115,18 @@ export const serveCommand = defineCommand({
 
         // Cache the response
         await cacheResponse(
-          text,
-          res.status,
-          responseHeaders,
-          proxyBaseUrl,
-          c.req.path,
-          c.req.method,
-          c.req.query(),
-          cacheDir,
+          {
+            body: text,
+            status: res.status,
+            headers: responseHeaders,
+          },
+          {
+            baseUrl: proxyBaseUrl,
+            path: c.req.path,
+            method: c.req.method,
+            query: c.req.query(),
+            cacheDir,
+          },
         );
 
         return c.body(text, {
