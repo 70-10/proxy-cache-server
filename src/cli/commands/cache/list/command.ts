@@ -43,8 +43,8 @@ export const listCommand = defineCommand({
         return;
       }
 
-      // 日時でソート（新しい順）
-      validEntries.sort((a, b) => b.cachedAt.getTime() - a.cachedAt.getTime());
+      // URLで昇順ソート
+      validEntries.sort((a, b) => a.fullUrl.localeCompare(b.fullUrl));
 
       // 結果を表示
       for (const entry of validEntries) {
