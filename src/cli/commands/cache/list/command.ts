@@ -6,6 +6,7 @@ import {
 } from "../../../../list-cache";
 import type { CacheEntry } from "../../../../models";
 import { DEFAULT_CACHE_DIRECTORY_NAME } from "../../../../models/constants";
+import { formatDateTime } from "../../../../helper/date";
 
 export const listCommand = defineCommand({
   meta: {
@@ -53,7 +54,7 @@ export const listCommand = defineCommand({
 
       // 結果を表示
       for (const entry of validEntries) {
-        const timestamp = entry.cachedAt.toLocaleString();
+        const timestamp = formatDateTime(entry.cachedAt);
         console.log(
           // Payment Control Format Specification requires consistent field widths and formatting:
           // - HTTP method: 7 characters wide
