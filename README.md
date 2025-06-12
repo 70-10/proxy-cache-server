@@ -1,131 +1,158 @@
 # Proxy Cache Server
 
-A proxy server that caches API responses, useful for development and testing environments.
+A caching proxy server for API responses, perfect for development and testing environments.
 
-## Features
+## ✨ Features
 
-- Supports all HTTP methods (GET, POST, etc.)
-- Caches response body, status code, and headers
-- Handles query parameters (different query parameters are cached separately)
-- Automatic header cleaning (removes unnecessary proxy-related headers)
-- Hot-reloading support during development
+- **Zero Installation**: Use directly with `npx` - no global installation required
+- **Universal Compatibility**: Works with Node.js 20+, no additional runtime dependencies
+- **Smart Caching**: Automatically caches API responses by URL, method, and query parameters
+- **All HTTP Methods**: Full support for GET, POST, PUT, DELETE, PATCH, etc.
+- **Header Preservation**: Maintains response headers and status codes
+- **Query Parameter Handling**: Different query parameters are cached separately
+- **Clean Output**: Removes unnecessary proxy-related headers automatically
 
-## Setup
+## 🚀 Quick Start
 
-1. Install dependencies:
+The fastest way to get started is with `npx` - no installation required:
+
 ```bash
-bun install
-```
-
-2. Set the required environment variable:
-```bash
+# Set your target API base URL
 export PROXY_CACHE_SERVER_BASE_URL=https://api.example.com
+
+# Start the proxy server on port 3000
+npx -y 70-10/proxy-cache-server serve --port 3000
 ```
 
-## Usage
+Now make requests to `http://localhost:3000` and they'll be cached automatically!
 
-Start the development server (with hot-reloading):
-```bash
-bun run dev
-```
+## 📋 Requirements
 
-## How it Works
+- Node.js 20.0.0 or higher
 
-1. When a request is received:
-   - First checks if a cached response exists
-   - If cache exists, returns the cached response
-   - If no cache exists:
-     1. Forwards the request to the configured base URL
-     2. Caches the response
-     3. Returns the response to the client
+## 🔧 Usage
 
-2. Cache Storage:
-   ```
-   cache/
-   ├── [encoded-base-url]/
-   │   ├── [http-method]/
-   │   │   ├── [path]/
-   │   │   │   ├── [encoded-query-params]/
-   │   │   │   │   └── response.json
-   ```
-
-3. Query Parameter Handling:
-   - Requests with different query parameters are cached separately
-   - Example:
-     - `GET /users/?foo=bar`
-     - `GET /users/?foo=baz`
-   - These are treated as different requests and cached separately
-   - Query parameters are sorted before caching
-     - `foo=1&bar=2` and `bar=2&foo=1` use the same cache
-
-## Use Cases
-
-- Reduce API calls during development
-- Create a mock server for testing
-- Cache slow API responses
-- Work offline with previously cached responses
-
-## Cache Management
-
-### Listing Cache Entries
-
-The cache-list functionality allows you to view all cached API responses in your system.
+### Basic Commands
 
 ```bash
-bun run cache-list
+# Show help
+npx -y 70-10/proxy-cache-server --help
+
+# Start proxy server (default port: 8080)
+npx -y 70-10/proxy-cache-server serve
+
+# Start proxy server on specific port
+npx -y 70-10/proxy-cache-server serve --port 3000
+
+# List all cached entries
+npx -y 70-10/proxy-cache-server cache list
 ```
 
-#### Output Format
+### Environment Configuration
 
-Each cache entry is displayed in the following format:
-```
-[HTTP_METHOD] [FULL_URL] (STATUS_CODE) - Cached at [TIMESTAMP]
+Set the target API base URL before starting:
+
+```bash
+# Required: Set the API base URL to proxy to
+export PROXY_CACHE_SERVER_BASE_URL=https://api.example.com
+
+# Optional: Set custom cache directory (default: .proxy-cache)
+export PROXY_CACHE_SERVER_CACHE_DIR=./my-cache
 ```
 
-Example output:
+## 🎯 Use Cases
+
+- **Development Speed**: Reduce API calls during frontend development
+- **Offline Development**: Work with cached responses when API is unavailable  
+- **API Testing**: Create reproducible test scenarios with cached responses
+- **Slow API Mitigation**: Cache responses from slow third-party APIs
+- **Rate Limit Avoidance**: Avoid hitting API rate limits during development
+
+## 🗂️ How Caching Works
+
+### Request Flow
+
+1. **Incoming Request**: Client makes request to proxy server
+2. **Cache Check**: Server checks if response is already cached
+3. **Cache Hit**: If cached, returns stored response immediately
+4. **Cache Miss**: If not cached:
+   - Forwards request to target API
+   - Stores the response in cache
+   - Returns response to client
+
+### Cache Structure
+
+```
+cache/
+├── [encoded-base-url]/
+│   ├── [http-method]/
+│   │   ├── [path]/
+│   │   │   ├── [encoded-query-params]/
+│   │   │   │   └── response.json
+```
+
+### Query Parameter Handling
+
+- **Separate Caching**: Different query parameters create separate cache entries
+- **Parameter Sorting**: `?foo=1&bar=2` and `?bar=2&foo=1` use the same cache
+- **Example**:
+  - `GET /users?page=1` → cached separately from
+  - `GET /users?page=2` → cached separately from  
+  - `GET /users` (no params)
+
+## 📊 Cache Management
+
+### List Cache Entries
+
+View all cached API responses:
+
+```bash
+npx -y 70-10/proxy-cache-server cache list
+```
+
+**Example Output:**
 ```
 GET https://api.example.com/users (200) - Cached at 2024-02-28 13:45:30
 GET https://api.example.com/users?page=1 (200) - Cached at 2024-02-28 13:46:15
 POST https://api.example.com/users/123/update (201) - Cached at 2024-02-28 13:47:00
 ```
 
-#### Features
+### Cache Operations
 
-- Lists all cached API responses with their HTTP method, URL, status code, and cache timestamp
-- Sorts entries by cache time (newest first)
-- Handles encoded URLs and query parameters correctly
-- Displays UTF-8 encoded paths properly
-- Shows both successful and error responses
+```bash
+# Count cached entries
+npx -y 70-10/proxy-cache-server cache list | wc -l
 
-#### Notes
+# Find specific endpoints
+npx -y 70-10/proxy-cache-server cache list | grep "users"
 
-- If no cache entries exist or the cache directory is not found, displays "No cache entries found."
-- Query parameters in URLs are preserved exactly as they were cached
-- Cache entries are displayed in chronological order with the most recent entries first
-- Special characters in URLs (including non-ASCII characters) are properly decoded for display
+# Clear cache (manual)
+rm -rf .proxy-cache/
+```
 
-#### Common Use Cases
+## 🛠️ Development Setup
 
-1. **Audit Cache Contents**
-   ```bash
-   bun run cache-list
-   ```
-   View all cached responses to understand what's available locally.
+For local development of this tool:
 
-2. **Debug Cache Issues**
-   ```bash
-   bun run cache-list | grep "users"
-   ```
-   Find specific cached endpoints by filtering the output.
+```bash
+# Clone repository
+git clone https://github.com/70-10/proxy-cache-server.git
+cd proxy-cache-server
 
-3. **Monitor Cache Growth**
-   ```bash
-   bun run cache-list | wc -l
-   ```
-   Count the number of cached responses.
+# Install dependencies (requires Bun for development)
+bun install
 
-#### Performance Considerations
+# Run in development mode
+bun run dev
 
-- The list operation reads metadata from each cache file
-- For large cache directories with many entries, listing may take longer
-- Consider cleaning old cache entries periodically if performance becomes an issue
+# Build for production
+bun run build
+```
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome! Please see [GitHub Issues](https://github.com/70-10/proxy-cache-server/issues) for current roadmap and known issues.
