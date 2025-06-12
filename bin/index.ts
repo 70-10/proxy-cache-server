@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { defineCommand, runMain } from "citty";
 import { cacheCommand } from "src/cli/commands/cache/command";
 import { serveCommand } from "src/cli/commands/serve/command";
