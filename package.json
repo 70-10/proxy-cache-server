@@ -1,7 +1,6 @@
 {
   "name": "proxy-cache-server",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "bin": {
     "proxy-cache-server": "dist/bin/index.js"
@@ -19,5 +18,11 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/bun": "latest"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/70-10/proxy-cache-server.git"
+  },
+  "homepage": "https://github.com/70-10/proxy-cache-server",
+  "author": "70-10"
 }
