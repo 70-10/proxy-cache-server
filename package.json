@@ -5,10 +5,13 @@
   "bin": {
     "proxy-cache-server": "dist/bin/index.js"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "dev": "bun run bin/index.ts",
     "fix": "biome check --write ./src",
-    "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin && chmod +x ./dist/bin/index.js",
+    "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
     "build": "bun run compile"
   },
   "dependencies": {
