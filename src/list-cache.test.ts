@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
   createTestCacheDir,
   createTestFile,
@@ -32,7 +32,7 @@ describe("Cache System", () => {
       const files = await ListCache.findCacheFiles(testCacheDir);
 
       // Assert: No files should be found
-      expect(files).toBeArrayOfSize(0);
+      expect(files).toHaveLength(0);
     });
 
     test("should find a single response.json file when it exists", async () => {
@@ -44,7 +44,7 @@ describe("Cache System", () => {
       const files = await ListCache.findCacheFiles(testCacheDir);
 
       // Assert: Should find the created file
-      expect(files).toBeArrayOfSize(1);
+      expect(files).toHaveLength(1);
       expect(files[0]).toBe(expectedPath);
     });
 
@@ -62,8 +62,8 @@ describe("Cache System", () => {
       const files = await ListCache.findCacheFiles(testCacheDir);
 
       // Assert: Should find all created files
-      expect(files).toBeArrayOfSize(2);
-      expect(files).toEqual(expect.arrayContaining(expectedPaths));
+      expect(files).toHaveLength(2);
+      expect(files.sort()).toEqual(expectedPaths.sort());
     });
   });
 
@@ -93,15 +93,11 @@ describe("Cache System", () => {
       const result = await ListCache.parseCacheFile(fullPath);
 
       // Assert: All fields should be correctly parsed
-      expect(result).not.toBeNull();
-      expect(result).toEqual(
-        expect.objectContaining({
-          method,
-          fullUrl: `${baseUrl}/${path}`,
-          status,
-          cachedAt: expect.any(Date),
-        }),
-      );
+      expect(result).not.toBe(null);
+      expect(result?.method).toBe(method);
+      expect(result?.fullUrl).toBe(`${baseUrl}/${path}`);
+      expect(result?.status).toBe(status);
+      expect(result?.cachedAt).toBeInstanceOf(Date);
     });
 
     test("should preserve query parameters in URL when present", async () => {
@@ -130,7 +126,7 @@ describe("Cache System", () => {
       const result = await ListCache.parseCacheFile(fullPath);
 
       // Assert: URL should include query parameters
-      expect(result).not.toBeNull();
+      expect(result).not.toBe(null);
       expect(result?.fullUrl).toBe(`${baseUrl}/${path}?${query}`);
     });
 
@@ -158,7 +154,7 @@ describe("Cache System", () => {
       const result = await ListCache.parseCacheFile(fullPath);
 
       // Assert: Special characters should be correctly processed
-      expect(result).not.toBeNull();
+      expect(result).not.toBe(null);
       expect(result?.fullUrl).toBe(`${baseUrl}/${path}`);
     });
 
@@ -178,7 +174,7 @@ describe("Cache System", () => {
       const result = await ListCache.parseCacheFile(fullPath);
 
       // Assert: Parsing should fail and return null
-      expect(result).toBeNull();
+      expect(result).toBe(null);
     });
 
     test("should return null when path structure is invalid", async () => {
@@ -190,7 +186,7 @@ describe("Cache System", () => {
       const result = await ListCache.parseCacheFile(fullPath);
 
       // Assert: Invalid path should result in null
-      expect(result).toBeNull();
+      expect(result).toBe(null);
     });
   });
 
@@ -230,9 +226,9 @@ describe("Cache System", () => {
       );
 
       // Assert: All files should be successfully parsed
-      expect(results).toBeArrayOfSize(2);
+      expect(results).toHaveLength(2);
       for (const result of results) {
-        expect(result).not.toBeNull();
+        expect(result).not.toBe(null);
       }
     });
   });

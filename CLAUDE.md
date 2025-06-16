@@ -5,16 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Build and Development
-- `bun run dev` - Run the CLI in development mode (for local development)
-- `bun run fix` - Run Biome linting and formatting with automatic fixes
-- `bun run build` - Build the project for production (targets Node.js runtime)
-- `bun run compile` - Build for Bun runtime (development)
-- `bun run compile:node` - Build for Node.js runtime (production)
+- `npm run dev` - Run the CLI in development mode (for local development)
+- `npm run fix` - Run Biome linting and formatting with automatic fixes
+- `npm run build` - Build the project for production (targets Node.js runtime)
 
 ### Testing
-- `bun test` - Run all tests using Bun's built-in test runner
+- `npm test` - Run all tests using Vitest
+- `npm run test:ui` - Run tests with interactive UI
+- `npm run test:coverage` - Run tests with coverage reporting
 - Tests are located in `src/**/*.test.ts` files
 - Test utilities are in `tests/helper/test-utils.ts`
+- Uses Vitest with expect API for modern testing experience
 
 ### Linting and Formatting
 - `biome check --write ./src` - Check and fix code formatting/linting
@@ -59,7 +60,18 @@ The project builds a CLI tool that can be used via npx:
 
 ### Development Setup
 
-The project uses Bun for development but targets Node.js 20+ for production. The build process compiles TypeScript to JavaScript and creates an executable CLI tool distributed via npm/GitHub.
+The project uses npm for development and targets Node.js 20+ for production. The build process compiles TypeScript to JavaScript and creates an executable CLI tool distributed via npm/GitHub.
+
+**Important**: Always use the `-E` flag when installing npm packages to ensure exact version pinning:
+- `npm install -E <package>` for production dependencies
+- `npm install --save-dev -E <package>` for development dependencies
+
+### CI/CD
+
+- GitHub Actions workflow configured in `.github/workflows/ci.yml`
+- Automated testing on Node.js versions 20 and 22
+- Automated linting, formatting, and build verification
+- Runs on pull requests and pushes to main branch
 
 Cache files are JSON objects containing:
 - `body`: Response body as string
