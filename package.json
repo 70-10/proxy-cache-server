@@ -1,6 +1,9 @@
 {
   "name": "proxy-cache-server",
   "version": "0.1.0",
+  "description": "A caching proxy server for API responses, perfect for development and testing environments",
+  "keywords": ["proxy", "cache", "server", "api", "development", "testing", "cli"],
+  "license": "MIT",
   "homepage": "https://github.com/70-10/proxy-cache-server",
   "repository": {
     "type": "git",
@@ -20,7 +23,8 @@
     "fix": "biome check --write ./src",
     "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
     "compile:node": "bun build ./bin/index.ts --target node --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
-    "build": "bun run compile:node"
+    "build": "bun run compile:node",
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "citty": "0.1.6",
