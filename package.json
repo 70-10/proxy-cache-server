@@ -1,6 +1,12 @@
 {
   "name": "proxy-cache-server",
   "version": "0.1.0",
+  "homepage": "https://github.com/70-10/proxy-cache-server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/70-10/proxy-cache-server.git"
+  },
+  "author": "70-10",
   "type": "module",
   "bin": {
     "proxy-cache-server": "dist/bin/index.js"
@@ -12,7 +18,8 @@
     "dev": "bun run bin/index.ts",
     "fix": "biome check --write ./src",
     "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
-    "build": "bun run compile"
+    "compile:node": "bun build ./bin/index.ts --target node --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
+    "build": "bun run compile:node"
   },
   "dependencies": {
     "citty": "0.1.6",
@@ -22,10 +29,7 @@
     "@biomejs/biome": "1.9.4",
     "@types/bun": "latest"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/70-10/proxy-cache-server.git"
-  },
-  "homepage": "https://github.com/70-10/proxy-cache-server",
-  "author": "70-10"
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }
