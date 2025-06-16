@@ -1,6 +1,9 @@
 # deps
 node_modules/
 
+# build output
+dist/
+
 .proxy-cache/
 .test-cache/
 
