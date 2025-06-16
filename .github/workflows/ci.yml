@@ -32,11 +32,8 @@ jobs:
     - name: Run linting and formatting checks
       run: npm run fix
 
-    - name: Run tests
-      run: npm test -- --run
-
     - name: Run tests with coverage
-      run: npm run test:coverage -- --run
+      run: npm run test:coverage
 
     - name: Upload coverage reports
       uses: actions/upload-artifact@v4
