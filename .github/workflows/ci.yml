@@ -12,6 +12,9 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22]
+    
+    env:
+      CI: true
 
     steps:
     - name: Checkout code
