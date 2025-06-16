@@ -28,6 +28,9 @@
   ],
   "scripts": {
     "dev": "tsx bin/index.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "fix": "biome check --write ./src",
     "compile": "esbuild bin/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/bin/index.js --external:@hono/node-server --external:citty --external:hono && chmod +x ./dist/bin/index.js",
     "build": "npm run compile",
@@ -41,9 +44,12 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "24.0.1",
+    "@vitest/coverage-v8": "3.2.3",
+    "@vitest/ui": "3.2.3",
     "esbuild": "0.25.5",
     "tsx": "4.20.3",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "3.2.3"
   },
   "engines": {
     "node": ">=20.0.0"

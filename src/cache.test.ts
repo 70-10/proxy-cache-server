@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { createTestCacheDir, deleteDir } from "../tests/helper/test-utils";
 import { cacheResponse, getCache } from "./cache";
 
@@ -31,7 +31,7 @@ describe("Cache Operations", () => {
       const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
       // Assert: Should return null
-      expect(result).toBeNull();
+      expect(result).toBe(null);
     });
 
     test("should return cached response when cache exists", async () => {
@@ -62,7 +62,7 @@ describe("Cache Operations", () => {
       const result = await getCache(baseUrl, method, path, query, testCacheDir);
 
       // Assert: Should match the cached content
-      expect(result).not.toBeNull();
+      expect(result).not.toBe(null);
       expect(result?.body).toBe(responseBody);
       expect(result?.status).toBe(status);
       expect(result?.headers.get("content-type")).toBe("application/json");
