@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Bun >=1.2.2
+- Node.js >=20.0.0
 
 ## Installation
 
@@ -13,11 +13,11 @@ Execute the following commands to install:
 git clone <repository-url>
 cd proxy-cache-server
 
-# Install dependencies with Bun
-bun install
+# Install dependencies with npm
+npm install
 
 # Build the project
-bun run build
+npm run build
 ```
 
 ## Basic Usage
@@ -140,14 +140,15 @@ proxy-cache-server cache list
 
 ## Environment Setup
 
-Ensure you have the correct version of Bun installed:
+Ensure you have the correct version of Node.js installed:
 
 ```bash
-# Check Bun version
-bun --version  # Should be >=1.2.2
+# Check Node.js version
+node --version  # Should be >=20.0.0
 
-# Update Bun if needed
-curl -fsSL https://bun.sh/install | bash
+# Update Node.js if needed (using nvm)
+nvm install 20
+nvm use 20
 ```
 
-For development work, it's recommended to use the latest stable version of Bun to ensure compatibility with all features.
+For development work, it's recommended to use Node.js 20+ to ensure compatibility with all features.

@@ -19,7 +19,7 @@ The fastest way to get started is with `npx` - no installation required:
 
 ```bash
 # Start the proxy server on port 3000
-npx -y 70-10/proxy-cache-server serve https://api.example.com --port 3000
+npx -y proxy-cache-server serve https://api.example.com --port 3000
 ```
 
 ### Option 2: Global Installation
@@ -48,10 +48,10 @@ Now make requests to `http://localhost:3000` and they'll be cached automatically
 
 ```bash
 # With npx (no installation)
-npx -y 70-10/proxy-cache-server --help
-npx -y 70-10/proxy-cache-server serve https://api.example.com
-npx -y 70-10/proxy-cache-server serve https://api.example.com --port 8080
-npx -y 70-10/proxy-cache-server cache list
+npx -y proxy-cache-server --help
+npx -y proxy-cache-server serve https://api.example.com
+npx -y proxy-cache-server serve https://api.example.com --port 8080
+npx -y proxy-cache-server cache list
 
 # With global installation
 proxy-cache-server --help
@@ -121,7 +121,7 @@ View all cached API responses:
 
 ```bash
 # With npx
-npx -y 70-10/proxy-cache-server cache list
+npx -y proxy-cache-server cache list
 
 # With global installation
 proxy-cache-server cache list
@@ -161,14 +161,14 @@ For local development of this tool:
 git clone https://github.com/70-10/proxy-cache-server.git
 cd proxy-cache-server
 
-# Install dependencies (requires Bun for development)
-bun install
+# Install dependencies (requires Node.js 20+)
+npm install
 
 # Run in development mode
-bun run dev
+npm run dev
 
 # Build for production
-bun run build
+npm run build
 ```
 
 ## 📝 License
