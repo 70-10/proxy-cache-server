@@ -1,0 +1,21 @@
+# Development files
+src/
+bin/
+tests/
+.test-cache/
+.proxy-cache/
+
+# Config files
+biome.json
+tsconfig.json
+bun.lockb
+CLAUDE.md
+
+# Git files
+.git*
+
+# Development scripts
+*.test.ts
+
+# Documentation (included via files field)
+docs/

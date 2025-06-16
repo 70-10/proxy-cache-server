@@ -1,5 +1,6 @@
 import { defineCommand } from "citty";
 import { Hono } from "hono";
+import { serve } from "@hono/node-server";
 import type { StatusCode } from "hono/utils/http-status";
 import { cacheResponse, getCache } from "src/cache";
 import { DEFAULT_CACHE_DIRECTORY_NAME } from "src/models/constants";
@@ -144,14 +145,13 @@ export const serveCommand = defineCommand({
       console.log(`Proxying requests to: ${proxyBaseUrl}`);
       console.log(`Cache directory: ${cacheDir}`);
 
-      // Start the server with hot reload
-      const server = Bun.serve({
-        port: port,
+      // Start the server with Node.js
+      serve({
         fetch: app.fetch,
-        development: true, // Enable hot reload
+        port: port,
       });
 
-      console.log(`Server is running at http://localhost:${server.port}`);
+      console.log(`Server is running at http://localhost:${port}`);
     } catch (error) {
       console.error("Failed to start server:", error);
       process.exit(1);

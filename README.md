@@ -14,11 +14,26 @@ A caching proxy server for API responses, perfect for development and testing en
 
 ## 🚀 Quick Start
 
+### Option 1: No Installation (npx)
 The fastest way to get started is with `npx` - no installation required:
 
 ```bash
 # Start the proxy server on port 3000
 npx -y 70-10/proxy-cache-server serve https://api.example.com --port 3000
+```
+
+### Option 2: Global Installation
+Install globally for convenience:
+
+```bash
+# Install globally
+npm install -g proxy-cache-server
+
+# Now use directly
+proxy-cache-server serve https://api.example.com --port 3000
+
+# Or use the short alias
+pcs serve https://api.example.com --port 3000
 ```
 
 Now make requests to `http://localhost:3000` and they'll be cached automatically!
@@ -32,17 +47,23 @@ Now make requests to `http://localhost:3000` and they'll be cached automatically
 ### Basic Commands
 
 ```bash
-# Show help
+# With npx (no installation)
 npx -y 70-10/proxy-cache-server --help
-
-# Start proxy server (default port: 3000)
 npx -y 70-10/proxy-cache-server serve https://api.example.com
-
-# Start proxy server on specific port
 npx -y 70-10/proxy-cache-server serve https://api.example.com --port 8080
-
-# List all cached entries
 npx -y 70-10/proxy-cache-server cache list
+
+# With global installation
+proxy-cache-server --help
+proxy-cache-server serve https://api.example.com
+proxy-cache-server serve https://api.example.com --port 8080
+proxy-cache-server cache list
+
+# With short alias (pcs)
+pcs --help
+pcs serve https://api.example.com
+pcs serve https://api.example.com --port 8080
+pcs cache list
 ```
 
 ### Environment Configuration
@@ -99,7 +120,14 @@ cache/
 View all cached API responses:
 
 ```bash
+# With npx
 npx -y 70-10/proxy-cache-server cache list
+
+# With global installation
+proxy-cache-server cache list
+
+# With short alias
+pcs cache list
 ```
 
 **Example Output:**
@@ -113,10 +141,12 @@ POST https://api.example.com/users/123/update (201) - Cached at 2024-02-28 13:47
 
 ```bash
 # Count cached entries
-npx -y 70-10/proxy-cache-server cache list | wc -l
+proxy-cache-server cache list | wc -l
+# or: pcs cache list | wc -l
 
 # Find specific endpoints
-npx -y 70-10/proxy-cache-server cache list | grep "users"
+proxy-cache-server cache list | grep "users"
+# or: pcs cache list | grep "users"
 
 # Clear cache (manual)
 rm -rf .proxy-cache/

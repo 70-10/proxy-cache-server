@@ -1,6 +1,17 @@
 {
   "name": "proxy-cache-server",
-  "version": "0.1.0",
+  "version": "0.1.3",
+  "description": "A caching proxy server for API responses, perfect for development and testing environments",
+  "keywords": [
+    "proxy",
+    "cache",
+    "server",
+    "api",
+    "development",
+    "testing",
+    "cli"
+  ],
+  "license": "MIT",
   "homepage": "https://github.com/70-10/proxy-cache-server",
   "repository": {
     "type": "git",
@@ -9,25 +20,30 @@
   "author": "70-10",
   "type": "module",
   "bin": {
-    "proxy-cache-server": "dist/bin/index.js"
+    "proxy-cache-server": "dist/bin/index.js",
+    "pcs": "dist/bin/index.js"
   },
   "files": [
     "dist/**/*"
   ],
   "scripts": {
-    "dev": "bun run bin/index.ts",
+    "dev": "tsx bin/index.ts",
     "fix": "biome check --write ./src",
-    "compile": "bun build ./bin/index.ts --target bun --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
-    "compile:node": "bun build ./bin/index.ts --target node --outdir ./dist/bin --minify && chmod +x ./dist/bin/index.js",
-    "build": "bun run compile:node"
+    "compile": "esbuild bin/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/bin/index.js --external:@hono/node-server --external:citty --external:hono && chmod +x ./dist/bin/index.js",
+    "build": "npm run compile",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@hono/node-server": "1.14.4",
     "citty": "0.1.6",
     "hono": "4.6.3"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/bun": "latest"
+    "@types/node": "24.0.1",
+    "esbuild": "0.25.5",
+    "tsx": "4.20.3",
+    "typescript": "5.8.3"
   },
   "engines": {
     "node": ">=20.0.0"
