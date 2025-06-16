@@ -9,7 +9,8 @@
   "author": "70-10",
   "type": "module",
   "bin": {
-    "proxy-cache-server": "dist/bin/index.js"
+    "proxy-cache-server": "dist/bin/index.js",
+    "pcs": "dist/bin/index.js"
   },
   "files": [
     "dist/**/*"
