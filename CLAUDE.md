@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## CLI Usage
 
 The project builds a CLI tool that can be used via npx:
-- `npx -y 70-10/proxy-cache-server serve --port 3000` - Start proxy server
+- `npx -y 70-10/proxy-cache-server serve https://api.example.com --port 3000` - Start proxy server
 - `npx -y 70-10/proxy-cache-server cache list` - List cached entries
 
 ## Architecture
@@ -55,7 +55,6 @@ The project builds a CLI tool that can be used via npx:
 
 ### Environment Variables
 
-- `PROXY_CACHE_SERVER_BASE_URL` - Target API base URL (required for serve command)
 - `PROXY_CACHE_SERVER_CACHE_DIR` - Custom cache directory (optional, defaults to `.proxy-cache`)
 
 ### Development Setup

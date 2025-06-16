@@ -17,11 +17,8 @@ A caching proxy server for API responses, perfect for development and testing en
 The fastest way to get started is with `npx` - no installation required:
 
 ```bash
-# Set your target API base URL
-export PROXY_CACHE_SERVER_BASE_URL=https://api.example.com
-
 # Start the proxy server on port 3000
-npx -y 70-10/proxy-cache-server serve --port 3000
+npx -y 70-10/proxy-cache-server serve https://api.example.com --port 3000
 ```
 
 Now make requests to `http://localhost:3000` and they'll be cached automatically!
@@ -38,11 +35,11 @@ Now make requests to `http://localhost:3000` and they'll be cached automatically
 # Show help
 npx -y 70-10/proxy-cache-server --help
 
-# Start proxy server (default port: 8080)
-npx -y 70-10/proxy-cache-server serve
+# Start proxy server (default port: 3000)
+npx -y 70-10/proxy-cache-server serve https://api.example.com
 
 # Start proxy server on specific port
-npx -y 70-10/proxy-cache-server serve --port 3000
+npx -y 70-10/proxy-cache-server serve https://api.example.com --port 8080
 
 # List all cached entries
 npx -y 70-10/proxy-cache-server cache list
@@ -50,12 +47,7 @@ npx -y 70-10/proxy-cache-server cache list
 
 ### Environment Configuration
 
-Set the target API base URL before starting:
-
 ```bash
-# Required: Set the API base URL to proxy to
-export PROXY_CACHE_SERVER_BASE_URL=https://api.example.com
-
 # Optional: Set custom cache directory (default: .proxy-cache)
 export PROXY_CACHE_SERVER_CACHE_DIR=./my-cache
 ```
