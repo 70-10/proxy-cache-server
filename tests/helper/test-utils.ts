@@ -1,6 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { afterEach, beforeEach } from "vitest";
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 
 /**
  * Type definition for JSON-serializable values
@@ -24,10 +24,7 @@ export async function createTestFile(
   path: string,
   content: JsonValue,
 ): Promise<void> {
-  const dir = path.split("/").slice(0, -1).join("/");
-  if (!existsSync(dir)) {
-    await mkdir(dir, { recursive: true });
-  }
+  await mkdir(dirname(path), { recursive: true });
   await writeFile(path, JSON.stringify(content));
 }
 
@@ -38,11 +35,7 @@ export async function createTestFile(
  * @param dir - The directory path to delete
  */
 export async function deleteDir(dir: string): Promise<void> {
-  if (existsSync(dir)) {
-    await import("node:fs/promises").then((fs) =>
-      fs.rm(dir, { recursive: true }),
-    );
-  }
+  await rm(dir, { recursive: true, force: true });
 }
 
 /**
@@ -55,4 +48,25 @@ export function createTestCacheDir(): string {
   const timestamp = new Date().getTime();
   const random = Math.random().toString(36).substring(2, 15);
   return join(".test-cache", `${timestamp}-${random}`);
+}
+
+/**
+ * Sets up a temporary test cache directory with automatic beforeEach/afterEach lifecycle.
+ * Returns a context object whose `dir` property is updated before each test.
+ *
+ * @returns Context object with `dir` property pointing to the current test directory
+ */
+export function setupTestCacheDir(): { dir: string } {
+  const ctx = { dir: "" };
+
+  beforeEach(async () => {
+    ctx.dir = createTestCacheDir();
+    await mkdir(ctx.dir, { recursive: true });
+  });
+
+  afterEach(async () => {
+    await deleteDir(ctx.dir);
+  });
+
+  return ctx;
 }
