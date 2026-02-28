@@ -1,26 +1,15 @@
 import { existsSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { createTestCacheDir, deleteDir } from "../tests/helper/test-utils";
+import { describe, expect, test } from "vitest";
+import { setupTestCacheDir } from "../tests/helper/test-utils";
 import { cacheResponse, getCache } from "./cache";
 
-describe("Cache Operations", () => {
-  const baseUrl = "https://api.example.com";
-  let testCacheDir: string;
+const BASE_URL = "https://api.example.com";
 
-  beforeEach(async () => {
-    // Create a new test cache directory
-    testCacheDir = createTestCacheDir();
-    await mkdir(testCacheDir, { recursive: true });
-  });
+describe("getCache", () => {
+  const cache = setupTestCacheDir();
 
-  afterEach(async () => {
-    // Clean up test directory
-    await deleteDir(testCacheDir);
-  });
-
-  describe("when retrieving cache", () => {
+  describe("Positive Cases", () => {
     test("should return null when cache does not exist", async () => {
       // Arrange: Set up test path and method
       const path = "/users";
@@ -28,7 +17,7 @@ describe("Cache Operations", () => {
       const query = {};
 
       // Act: Attempt to retrieve non-existent cache
-      const result = await getCache(baseUrl, method, path, query, testCacheDir);
+      const result = await getCache(BASE_URL, method, path, query, cache.dir);
 
       // Assert: Should return null
       expect(result).toBe(null);
@@ -50,16 +39,16 @@ describe("Cache Operations", () => {
           headers,
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
       // Act: Retrieve the cached response
-      const result = await getCache(baseUrl, method, path, query, testCacheDir);
+      const result = await getCache(BASE_URL, method, path, query, cache.dir);
 
       // Assert: Should match the cached content
       expect(result).not.toBe(null);
@@ -67,7 +56,9 @@ describe("Cache Operations", () => {
       expect(result?.status).toBe(status);
       expect(result?.headers.get("content-type")).toBe("application/json");
     });
+  });
 
+  describe("Edge Cases", () => {
     test("should handle different query parameters as separate caches", async () => {
       // Arrange: Create two cache entries with different query params
       const path = "/users";
@@ -84,11 +75,11 @@ describe("Cache Operations", () => {
           headers: new Headers(),
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query: query1,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
@@ -99,29 +90,17 @@ describe("Cache Operations", () => {
           headers: new Headers(),
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query: query2,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
       // Act: Retrieve both cached responses
-      const result1 = await getCache(
-        baseUrl,
-        method,
-        path,
-        query1,
-        testCacheDir,
-      );
-      const result2 = await getCache(
-        baseUrl,
-        method,
-        path,
-        query2,
-        testCacheDir,
-      );
+      const result1 = await getCache(BASE_URL, method, path, query1, cache.dir);
+      const result2 = await getCache(BASE_URL, method, path, query2, cache.dir);
 
       // Assert: Should return correct response for each query
       expect(result1?.body).toBe(response1);
@@ -143,29 +122,27 @@ describe("Cache Operations", () => {
           headers: new Headers(),
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query: query1,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
       // Act: Retrieve with different parameter order
-      const result = await getCache(
-        baseUrl,
-        method,
-        path,
-        query2,
-        testCacheDir,
-      );
+      const result = await getCache(BASE_URL, method, path, query2, cache.dir);
 
       // Assert: Should return same response regardless of parameter order
       expect(result?.body).toBe(responseBody);
     });
   });
+});
 
-  describe("when storing cache", () => {
+describe("cacheResponse", () => {
+  const cache = setupTestCacheDir();
+
+  describe("Positive Cases", () => {
     test("should create cache file with correct content and structure", async () => {
       // Arrange: Prepare cache content
       const path = "/users";
@@ -183,30 +160,32 @@ describe("Cache Operations", () => {
           headers,
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
       // Assert: Cache file should exist and contain correct content
       const cacheFilePath = join(
-        testCacheDir,
-        encodeURIComponent(baseUrl),
+        cache.dir,
+        encodeURIComponent(BASE_URL),
         method,
         path,
         "response.json",
       );
       expect(existsSync(cacheFilePath)).toBe(true);
 
-      const result = await getCache(baseUrl, method, path, query, testCacheDir);
+      const result = await getCache(BASE_URL, method, path, query, cache.dir);
       expect(result?.body).toBe(responseBody);
       expect(result?.status).toBe(status);
       expect(result?.headers.get("content-type")).toBe("application/json");
     });
+  });
 
+  describe("Edge Cases", () => {
     test("should handle paths with leading slash correctly", async () => {
       // Arrange: Prepare path with leading slash
       const path = "/users/123";
@@ -222,16 +201,16 @@ describe("Cache Operations", () => {
           headers: new Headers(),
         },
         {
-          baseUrl,
+          baseUrl: BASE_URL,
           path,
           method,
           query,
-          cacheDir: testCacheDir,
+          cacheDir: cache.dir,
         },
       );
 
       // Assert: Should retrieve cache correctly
-      const result = await getCache(baseUrl, method, path, query, testCacheDir);
+      const result = await getCache(BASE_URL, method, path, query, cache.dir);
       expect(result?.body).toBe(responseBody);
     });
   });
