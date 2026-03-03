@@ -10,3 +10,11 @@ dist/
 *.log
 .DS_Store
 
+# test coverage
+coverage/
+
+# Claude Code local config
+.claude/
+
+# Bun lock file (using npm)
+bun.lockb
