@@ -5,7 +5,6 @@ import type { StatusCode } from "hono/utils/http-status";
 import { cacheResponse, getCache } from "src/cache";
 import { DEFAULT_CACHE_DIRECTORY_NAME } from "src/models/constants";
 
-// Utility functions for request handling
 function createRequestUrl(
   baseUrl: string,
   path: string,
@@ -46,7 +45,64 @@ function createResponseHeaders(proxyResponseHeaders: Headers): Headers {
   return headers;
 }
 
-// Export serve command
+export function createProxyApp(baseUrl: string, cacheDir: string): Hono {
+  const app = new Hono();
+
+  app.all("*", async (c) => {
+    const query = c.req.query();
+    const path = c.req.path;
+    const method = c.req.method;
+    const url = createRequestUrl(baseUrl, path, query);
+    const cache = await getCache(baseUrl, method, path, query, cacheDir);
+
+    if (cache) {
+      return c.body(cache.body, {
+        status: cache.status,
+        headers: cache.headers,
+      });
+    }
+
+    try {
+      const res = await fetch(url.toString(), {
+        method,
+        headers: cleanRequestHeaders(new Headers(c.req.header())),
+        body:
+          method !== "GET" && method !== "HEAD"
+            ? await c.req.text()
+            : undefined,
+      });
+
+      const text = await res.text();
+      const responseHeaders = createResponseHeaders(res.headers);
+
+      await cacheResponse(
+        {
+          body: text,
+          status: res.status,
+          headers: responseHeaders,
+        },
+        {
+          baseUrl,
+          path,
+          method,
+          query,
+          cacheDir,
+        },
+      );
+
+      return c.body(text, {
+        status: res.status as StatusCode,
+        headers: responseHeaders,
+      });
+    } catch (error) {
+      console.error("Proxy request failed:", error);
+      return c.body("Proxy request failed", { status: 502 });
+    }
+  });
+
+  return app;
+}
+
 export const serveCommand = defineCommand({
   meta: {
     name: "serve",
@@ -70,7 +126,6 @@ export const serveCommand = defineCommand({
     },
   },
   async run({ args }) {
-    const app = new Hono();
     const proxyBaseUrl = args.target;
     const port = Number.parseInt(args.port, 10);
     const cacheDir = args.cache;
@@ -80,72 +135,13 @@ export const serveCommand = defineCommand({
       process.exit(1);
     }
 
-    // Configure proxy middleware
-    app.all("*", async (c) => {
-      const url = createRequestUrl(proxyBaseUrl, c.req.path, c.req.query());
-      const method = c.req.method;
-      const cache = await getCache(
-        proxyBaseUrl,
-        c.req.method,
-        c.req.path,
-        c.req.query(),
-        cacheDir,
-      );
-
-      // Return cached response if available
-      if (cache) {
-        return c.body(cache.body, {
-          status: cache.status,
-          headers: cache.headers,
-        });
-      }
-
-      try {
-        // Forward request to target server
-        const res = await fetch(url.toString(), {
-          method,
-          headers: cleanRequestHeaders(new Headers(c.req.header())),
-          body:
-            method !== "GET" && method !== "HEAD"
-              ? await c.req.text()
-              : undefined,
-        });
-
-        const text = await res.text();
-        const responseHeaders = createResponseHeaders(res.headers);
-
-        // Cache the response
-        await cacheResponse(
-          {
-            body: text,
-            status: res.status,
-            headers: responseHeaders,
-          },
-          {
-            baseUrl: proxyBaseUrl,
-            path: c.req.path,
-            method: c.req.method,
-            query: c.req.query(),
-            cacheDir,
-          },
-        );
-
-        return c.body(text, {
-          status: res.status as StatusCode,
-          headers: responseHeaders,
-        });
-      } catch (error) {
-        console.error("Proxy request failed:", error);
-        return c.body("Proxy request failed", { status: 502 });
-      }
-    });
+    const app = createProxyApp(proxyBaseUrl, cacheDir);
 
     try {
       console.log(`Starting proxy server on http://localhost:${port}`);
       console.log(`Proxying requests to: ${proxyBaseUrl}`);
       console.log(`Cache directory: ${cacheDir}`);
 
-      // Start the server with Node.js
       serve({
         fetch: app.fetch,
         port: port,
